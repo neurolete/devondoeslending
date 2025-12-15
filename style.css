@@ -1,14 +1,12 @@
 :root{
-  /* Palette A — Walnut + Clay */
-  --bg: #14110E;
-  --surface: #1E1914;
-  --surface-2: #231D17;
-  --text: #F3EEE6;
-  --muted: #B8AEA3;
-  --line: rgba(243, 238, 230, 0.10);
+ --bg: #0F1115;        /* charcoal */
+--surface: #151922;   /* card background */
+--surface-2: #1C2230;
+--text: #F4F6F8;      /* soft white */
+--muted: #A9AFBC;     /* cool grey */
 
-  --accent: #C46A4A;     /* clay */
-  --accent-2: #7A8450;   /* olive */
+--accent: #8FA8C8;    /* muted steel blue */
+--accent-2: #8F9F8B;  /* subtle sage */
 
   --shadow: 0 18px 50px rgba(0,0,0,0.45);
   --radius: 18px;
