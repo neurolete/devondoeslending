@@ -1,3 +1,4 @@
+const LEAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbxoORks2-oYPeH5l5WS8e6enxhWS5mHlOYBkcyvGVCl69wbftPEoi9CJH5oW6MK7bHn/exec";
 // Footer year
 document.getElementById("year").textContent = new Date().getFullYear();
 
