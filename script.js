@@ -3,18 +3,12 @@ const LEAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbwPhF1wDvt6SHaCV0
 // Footer year
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// Lead gate unlock
+// Elements
 const gate = document.getElementById("gate");
 const calcBody = document.getElementById("calcBody");
 const gateForm = document.getElementById("gateForm");
 
-// *** FORCE STOP ANY DEFAULT SCROLLING ***
-gateForm.addEventListener("submit", e => e.preventDefault());
-gate.querySelectorAll('a[href="#"]').forEach(a => {
-  a.addEventListener("click", e => e.preventDefault());
-});
-
-// Unlock calc
+// Unlock calculator
 function unlockCalculator() {
   const email = gateForm.querySelector('input[name="email"]').value.trim();
   localStorage.setItem("calc_unlocked", "true");
@@ -32,7 +26,7 @@ if (localStorage.getItem("calc_unlocked") === "true") {
   calcBody.setAttribute("aria-hidden", "false");
 }
 
-// Submit lead + unlock
+// Lead capture
 gateForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
@@ -80,8 +74,10 @@ function calcMonthlyPayment(principal, annualRatePct, years) {
   const r = (annualRatePct / 100) / 12;
   const n = years * 12;
   if (r === 0) return principal / n;
-  return principal * (r * Math.pow(1 + r, n)) /
-         (Math.pow(1 + r, n) - 1);
+
+  return principal *
+    (r * Math.pow(1 + r, n)) /
+    (Math.pow(1 + r, n) - 1);
 }
 
 // -----------------------------
@@ -96,10 +92,8 @@ document.getElementById("calcBtn").addEventListener("click", async () => {
   const principal = Math.max(homePrice - downPayment, 0);
   const monthly = calcMonthlyPayment(principal, rate, years);
 
-  document.getElementById("monthlyPayment").textContent =
-    formatCurrency(monthly);
+  document.getElementById("monthlyPayment").textContent = formatCurrency(monthly);
 
-  // log every calc click
   const email =
     localStorage.getItem("user_email") ||
     gateForm.querySelector('input[name="email"]').value.trim();
