@@ -8,9 +8,17 @@ const gate = document.getElementById("gate");
 const calcBody = document.getElementById("calcBody");
 const gateForm = document.getElementById("gateForm");
 
+// *** FORCE STOP ANY DEFAULT SCROLLING ***
+gateForm.addEventListener("submit", e => e.preventDefault());
+gate.querySelectorAll('a[href="#"]').forEach(a => {
+  a.addEventListener("click", e => e.preventDefault());
+});
+
+// Unlock calc
 function unlockCalculator() {
+  const email = gateForm.querySelector('input[name="email"]').value.trim();
   localStorage.setItem("calc_unlocked", "true");
-  localStorage.setItem("user_email", gateForm.querySelector('input[name="email"]').value.trim());
+  localStorage.setItem("user_email", email);
 
   gate.style.display = "none";
   calcBody.classList.remove("locked");
@@ -24,11 +32,11 @@ if (localStorage.getItem("calc_unlocked") === "true") {
   calcBody.setAttribute("aria-hidden", "false");
 }
 
+// Submit lead + unlock
 gateForm.addEventListener("submit", async (e) => {
   e.preventDefault();
 
   const email = gateForm.querySelector('input[name="email"]').value.trim();
-
   const payload = {
     email,
     source: "Mortgage Calculator",
@@ -50,13 +58,11 @@ gateForm.addEventListener("submit", async (e) => {
     if (!data.ok) throw new Error(data.error || "Failed to submit lead");
 
     unlockCalculator();
-
   } catch (err) {
     console.error(err);
     alert("Something went wrong saving your email. Please try again.");
   }
 });
-
 
 // ---------------------------
 // Mortgage Calculator
@@ -73,19 +79,15 @@ function formatCurrency(n) {
 function calcMonthlyPayment(principal, annualRatePct, years) {
   const r = (annualRatePct / 100) / 12;
   const n = years * 12;
-
   if (r === 0) return principal / n;
-
   return principal * (r * Math.pow(1 + r, n)) /
-    (Math.pow(1 + r, n) - 1);
+         (Math.pow(1 + r, n) - 1);
 }
-
 
 // -----------------------------
 // LOG EVERY CALC CLICK
 // -----------------------------
 document.getElementById("calcBtn").addEventListener("click", async () => {
-
   const homePrice = Number(document.getElementById("homePrice").value || 0);
   const downPayment = Number(document.getElementById("downPayment").value || 0);
   const rate = Number(document.getElementById("rate").value || 0);
@@ -97,12 +99,12 @@ document.getElementById("calcBtn").addEventListener("click", async () => {
   document.getElementById("monthlyPayment").textContent =
     formatCurrency(monthly);
 
-  // NEW: log every calculation
+  // log every calc click
   const email =
     localStorage.getItem("user_email") ||
     gateForm.querySelector('input[name="email"]').value.trim();
 
-  if (!email) return; // Don't log if no email yet
+  if (!email) return;
 
   const payload = {
     email,
