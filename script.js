@@ -1,27 +1,56 @@
 const LEAD_ENDPOINT = "https://script.google.com/macros/s/AKfycbxoORks2-oYPeH5l5WS8e6enxhWS5mHlOYBkcyvGVCl69wbftPEoi9CJH5oW6MK7bHn/exec";
+
 // Footer year
 document.getElementById("year").textContent = new Date().getFullYear();
 
-// Lead gate unlock
+// Lead gate unlock (Google Apps Script -> Sheet + email to Devon)
 const gate = document.getElementById("gate");
 const calcBody = document.getElementById("calcBody");
 const gateForm = document.getElementById("gateForm");
 
-function setUnlocked() {
+function unlockCalculator() {
   localStorage.setItem("calc_unlocked", "true");
   gate.style.display = "none";
   calcBody.classList.remove("locked");
   calcBody.setAttribute("aria-hidden", "false");
 }
 
-const alreadyUnlocked = localStorage.getItem("calc_unlocked") === "true";
-if (alreadyUnlocked) setUnlocked();
+// Auto-unlock for returning visitors
+if (localStorage.getItem("calc_unlocked") === "true") {
+  unlockCalculator();
+}
 
-gateForm.addEventListener("submit", (e) => {
+gateForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-  // Later: send email to Formspree/Mailchimp endpoint.
-  // For now: unlock immediately.
-  setUnlocked();
+
+  const email = gateForm.querySelector('input[name="email"]').value.trim();
+
+  const payload = {
+    email,
+    source: "Mortgage Calculator",
+    page: window.location.href,
+    homePrice: document.getElementById("homePrice")?.value || "",
+    downPayment: document.getElementById("downPayment")?.value || "",
+    rate: document.getElementById("rate")?.value || "",
+    years: document.getElementById("years")?.value || ""
+  };
+
+  try {
+    const res = await fetch(LEAD_ENDPOINT, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(payload)
+    });
+
+    const data = await res.json();
+    if (!data.ok) throw new Error(data.error || "Failed to submit lead");
+
+    // Only unlock if the lead was actually captured
+    unlockCalculator();
+  } catch (err) {
+    console.error(err);
+    alert("Something went wrong saving your email. Please try again.");
+  }
 });
 
 // Basic mortgage payment calc (principal & interest only)
