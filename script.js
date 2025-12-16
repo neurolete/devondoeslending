@@ -65,7 +65,25 @@ function calcMonthlyPayment(principal, annualRatePct, years) {
   if (r === 0) return principal / n;
   return principal * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
 }
+// NEW: auto-send calculation to Google Sheet
+const savedEmail = localStorage.getItem("user_email");
+if (savedEmail) {
+  const calcPayload = {
+    email: savedEmail,
+    source: "Mortgage Calculator - Recalc",
+    page: window.location.href,
+    homePrice,
+    downPayment,
+    rate,
+    years
+  };
 
+  fetch(LEAD_ENDPOINT, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(calcPayload)
+  }).catch(err => console.error("Calc send failed:", err));
+}
 document.getElementById("calcBtn").addEventListener("click", async () => {
   const homePrice = Number(document.getElementById("homePrice").value || 0);
   const downPayment = Number(document.getElementById("downPayment").value || 0);
