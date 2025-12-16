@@ -1,12 +1,15 @@
 :root{
- --bg: #0F1115;        /* charcoal */
---surface: #151922;   /* card background */
---surface-2: #1C2230;
---text: #F4F6F8;      /* soft white */
---muted: #A9AFBC;     /* cool grey */
+  /* OPTION 1 — Charcoal + Soft Stone */
+  --bg: #0F1115;        /* charcoal */
+  --surface: #151922;   /* card background */
+  --surface-2: #1C2230;
+  --text: #F4F6F8;      /* soft white */
+  --muted: #A9AFBC;     /* cool grey */
 
---accent: #8FA8C8;    /* muted steel blue */
---accent-2: #8F9F8B;  /* subtle sage */
+  --accent: #8FA8C8;    /* muted steel blue */
+  --accent-2: #8F9F8B;  /* subtle sage */
+
+  --line: rgba(244,246,248,0.10);
 
   --shadow: 0 18px 50px rgba(0,0,0,0.45);
   --radius: 18px;
