@@ -38,7 +38,6 @@ gateForm.addEventListener("submit", async (e) => {
   try {
     const res = await fetch(LEAD_ENDPOINT, {
       method: "POST",
-      headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload)
     });
 
