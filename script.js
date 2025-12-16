@@ -22,7 +22,6 @@ if (localStorage.getItem("calc_unlocked") === "true") {
 
 gateForm.addEventListener("submit", async (e) => {
   e.preventDefault();
-
   const email = gateForm.querySelector('input[name="email"]').value.trim();
 
   const payload = {
@@ -44,7 +43,6 @@ gateForm.addEventListener("submit", async (e) => {
     const data = await res.json();
     if (!data.ok) throw new Error(data.error || "Failed to submit lead");
 
-    // Only unlock if the lead was actually captured
     unlockCalculator();
   } catch (err) {
     console.error(err);
@@ -52,7 +50,10 @@ gateForm.addEventListener("submit", async (e) => {
   }
 });
 
-// Basic mortgage payment calc (principal & interest only)
+// -------------------------------
+// Mortgage Calculator (existing)
+// -------------------------------
+
 function formatCurrency(n) {
   if (!isFinite(n)) return "$—";
   return n.toLocaleString(undefined, { style: "currency", currency: "CAD", maximumFractionDigits: 0 });
@@ -65,7 +66,7 @@ function calcMonthlyPayment(principal, annualRatePct, years) {
   return principal * (r * Math.pow(1 + r, n)) / (Math.pow(1 + r, n) - 1);
 }
 
-document.getElementById("calcBtn").addEventListener("click", () => {
+document.getElementById("calcBtn").addEventListener("click", async () => {
   const homePrice = Number(document.getElementById("homePrice").value || 0);
   const downPayment = Number(document.getElementById("downPayment").value || 0);
   const rate = Number(document.getElementById("rate").value || 0);
@@ -73,6 +74,30 @@ document.getElementById("calcBtn").addEventListener("click", () => {
 
   const principal = Math.max(homePrice - downPayment, 0);
   const monthly = calcMonthlyPayment(principal, rate, years);
-
   document.getElementById("monthlyPayment").textContent = formatCurrency(monthly);
+
+  // -------------------------------------------
+  // NEW: send every calculation to the spreadsheet
+  // -------------------------------------------
+  const email = gateForm.querySelector('input[name="email"]').value.trim();
+
+  const payload = {
+    email,
+    source: "Calc Button",
+    page: window.location.href,
+    homePrice,
+    downPayment,
+    rate,
+    years
+  };
+
+  try {
+    await fetch(LEAD_ENDPOINT, {
+      method: "POST",
+      body: JSON.stringify(payload)
+    });
+    // No unlock needed here — already unlocked
+  } catch (err) {
+    console.error("Failed to log calc:", err);
+  }
 });
